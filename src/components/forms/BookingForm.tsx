@@ -39,8 +39,8 @@ export function BookingForm() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
-      const json = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null
-      if (!res.ok || !json?.ok) throw new Error(json?.error || 'Something went wrong. Please try again.')
+      const json = (await res.json().catch(() => null)) as { ok?: boolean; error?: string; message?: string } | null
+      if (!res.ok || json?.ok !== true) throw new Error(json?.message || 'Something went wrong. Please try again.')
       form.reset()
       setService(serviceFromQuery(queryService))
       setState({ phase: 'success' })
@@ -61,6 +61,11 @@ export function BookingForm() {
           </p>
         </div>
         <form className="booking-form" name="Signature consultation" aria-label="Signature consultation" onSubmit={onSubmit}>
+          {/* Honeypot: invisible to people, tempting to bots. */}
+          <div aria-hidden="true" style={{ position: 'absolute', left: '-10000px', width: 1, height: 1, overflow: 'hidden' }}>
+            <label htmlFor="form-field-company_website">Leave this field empty</label>
+            <input type="text" name="company_website" id="form-field-company_website" tabIndex={-1} autoComplete="off" />
+          </div>
           <div className="booking-form__field">
             <label htmlFor="form-field-name">Full name</label>
             <input type="text" name="name" id="form-field-name" required />

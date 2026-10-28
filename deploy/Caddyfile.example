@@ -1,0 +1,17 @@
+# Example only; not deployed. Copy to /etc/caddy/Caddyfile on the VPS.
+# Adjust the root path to wherever the repo is checked out. `npm run build` writes the site to <repo>/dist.
+signaturecarslounge.com, www.signaturecarslounge.com {
+	encode zstd gzip
+
+	# API: never falls through to the SPA
+	handle /api/* {
+		reverse_proxy 127.0.0.1:3001
+	}
+
+	# React app with SPA fallback so direct visits to /signature-about/ etc. work
+	handle {
+		root * /var/www/signaturecarslounge/dist
+		try_files {path} {path}/ /index.html
+		file_server
+	}
+}
